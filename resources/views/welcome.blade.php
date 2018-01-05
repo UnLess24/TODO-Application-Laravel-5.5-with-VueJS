@@ -11,10 +11,8 @@
 
     </head>
     <body>
-        <div class="flex-center position-ref full-height">
-            <div id="app">
-                <Todos />
-            </div>
+        <div id="app">
+            <Todos />
         </div>
     </body>
     <script src="{{ asset('/js/app.js') }}"></script>
