@@ -1,3 +1,4 @@
+import store from './store/index';
 
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -18,5 +19,6 @@ window.Vue = require('vue');
 Vue.component('Todos', require('./components/Todos.vue'));
 
 const app = new Vue({
-    el: '#app'
+  el: '#app',
+  store,
 });

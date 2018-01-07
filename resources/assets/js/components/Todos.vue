@@ -11,7 +11,8 @@
                         class="form-control"
                         placeholder="Наименование задачи"
                         @keyup.enter="create"
-                        v-model="todo.name"
+                        @change="setNewTodoName"
+                        :value="todoName"
                       />
                       <span class="input-group-btn">
                         <button class="btn btn-success" type="button" @click="create">Добавить задачу</button>
@@ -27,7 +28,7 @@
                             <label :class="{ done: todo.completed }">
                               <input
                                 type="checkbox"
-                                v-model="todo.completed"
+                                :checked="todo.completed"
                                 @change="done(todo)"
                               />
                                 {{ todo.name }}
@@ -55,61 +56,43 @@
 <script>
     export default {
         computed: {
+          todos () {
+            return this.$store.getters.getTodos;
+          },
+
+          todoName () {
+              return this.$store.getters.getTodo.name;
+          },
+
           todosCompleted () {
-            return this.todos.filter(todo => todo.completed == 1).length;
+            return this.$store.getters.getTodos.filter(todo => todo.completed == 1).length;
           },
 
           todosUnCompleted () {
-            return this.todos.filter(todo => todo.completed == 0).length;
+            return this.$store.getters.getTodos.filter(todo => todo.completed == 0).length;
           },
-        },
-
-        data () {
-          return {
-            todos: [],
-            todo: {
-              name: ''
-            },
-          }
         },
 
         mounted() {
-          this.fetchTodos();
+          this.$store.dispatch('fetchTodos');
         },
 
         methods: {
-          create () {
-            if (this.todo.name) {
-              axios.post('/api/todos', this.todo)
-                .then((res) => {
-                  this.todos.unshift(res.data);
-                  this.todo.name = '';
-                })
-                .catch();
-            }
-          },
 
-          remove (todo) {
-            axios.delete(`/api/todos/${todo.id}`)
-              .then((res) => {
-                const todoIndex = this.todos.indexOf(todo);
-                this.todos.splice(todoIndex, 1);
-              })
-              .catch(err => console.log(err));
+          create () {
+            this.$store.dispatch('createTodo');
           },
 
           done (todo) {
-            axios.put(`/api/todos/${todo.id}`, {
-              completed: todo.completed,
-            })
-              .then()
-              .catch(err => console.log(err));
+            this.$store.dispatch('doneTodo', todo);
           },
 
-          fetchTodos () {
-            axios.get('/api/todos')
-              .then(res => this.todos = res.data)
-              .catch(err => console.log(err));
+          remove (todo) {
+            this.$store.dispatch('removeTodo', todo);
+          },
+
+          setNewTodoName (event) {
+            this.$store.dispatch('setNewTodoName', event.target.value);
           },
         }
     }
